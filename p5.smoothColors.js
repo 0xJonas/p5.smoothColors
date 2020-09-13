@@ -1,14 +1,93 @@
 "use strict"
 
+/*
+=========================================================
+                  Standard White points
+=========================================================
+*/
+
+function initWhitePoint(x, y) {
+  return {
+    X: x / y,
+    Y: 1.0,
+    Z: (1.0 - x - y) / y,
+    u: 4.0 * x / (-2.0 * x + 12.0 * y + 3),
+    v: 9.0 * x / (-2.0 * x + 12.0 * y + 3)
+  }
+}
+
+const whitePoints = {
+  "a 2deg":    initWhitePoint(0.44757, 0.40745),
+  "a 10deg":   initWhitePoint(0.45117, 0.40594),
+  "b 2deg":    initWhitePoint(0.34842, 0.35161),
+  "b 10deg":   initWhitePoint(0.34980, 0.35270),
+  "c 2deg":    initWhitePoint(0.31006, 0.31616),
+  "c 10deg":   initWhitePoint(0.31039, 0.31905),
+  "d50 2deg":  initWhitePoint(0.34567, 0.35850),
+  "d50 10deg": initWhitePoint(0.34773, 0.35952),
+  "d55 2deg":  initWhitePoint(0.33242, 0.34743),
+  "d55 10deg": initWhitePoint(0.33411, 0.34877),
+  "d65 2deg":  initWhitePoint(0.31271, 0.32902),
+  "d65 10deg": initWhitePoint(0.31382, 0.33100),
+  "d75 2deg":  initWhitePoint(0.29902, 0.31485),
+  "d75 10deg": initWhitePoint(0.29968, 0.31740),
+  "e 2deg":    initWhitePoint(1.0 / 3.0, 1.0 / 3.0),
+  "e 10deg":   initWhitePoint(1.0 / 3.0, 1.0 / 3.0),
+  "f1 2deg":   initWhitePoint(0.31310, 0.33727),
+  "f1 10deg":  initWhitePoint(0.31811, 0.33559),
+  "f2 2deg":   initWhitePoint(0.37208, 0.37529),
+  "f2 10deg":  initWhitePoint(0.37925, 0.36733),
+  "f3 2deg":   initWhitePoint(0.40910, 0.39430),
+  "f3 10deg":  initWhitePoint(0.41761, 0.38324),
+  "f4 2deg":   initWhitePoint(0.44018, 0.40329),
+  "f4 10deg":  initWhitePoint(0.44920, 0.39074),
+  "f5 2deg":   initWhitePoint(0.31379, 0.34531),
+  "f5 10deg":  initWhitePoint(0.31975, 0.34246),
+  "f6 2deg":   initWhitePoint(0.37790, 0.38835),
+  "f6 10deg":  initWhitePoint(0.38660, 0.37847),
+  "f7 2deg":   initWhitePoint(0.31292, 0.32933),
+  "f7 10deg":  initWhitePoint(0.31569, 0.32960),
+  "f8 2deg":   initWhitePoint(0.34588, 0.35875),
+  "f8 10deg":  initWhitePoint(0.34902, 0.35939),
+  "f9 2deg":   initWhitePoint(0.37417, 0.37281),
+  "f9 10deg":  initWhitePoint(0.37829, 0.37045),
+  "f10 2deg":  initWhitePoint(0.34609, 0.35986),
+  "f10 10deg": initWhitePoint(0.35090, 0.35444),
+  "f11 2deg":  initWhitePoint(0.38052, 0.37713),
+  "f11 10deg": initWhitePoint(0.38541, 0.37123),
+  "f12 2deg":  initWhitePoint(0.43695, 0.40441),
+  "f12 10deg": initWhitePoint(0.44256, 0.39717)
+}
+
+p5.prototype.currentWhitePoint = "d65 2deg"
+p5.prototype.whitePointX = whitePoints["d65 2deg"].X
+p5.prototype.whitePointY = whitePoints["d65 2deg"].Y
+p5.prototype.whitePointZ = whitePoints["d65 2deg"].Z
+p5.prototype.whitePointU = whitePoints["d65 2deg"].u
+p5.prototype.whitePointV = whitePoints["d65 2deg"].v
+
+p5.prototype.whitePoint = function(name) {
+  if(name === undefined)
+    return this.currentWhitePoint
+  else {
+    const unifiedName = name.trim().toLowerCase()
+    const whitePoint = whitePoints[unifiedName]
+    this.whitePointX = whitePoint.X
+    this.whitePointY = whitePoint.Y
+    this.whitePointZ = whitePoint.Z
+    this.whitePointU = whitePoint.u
+    this.whitePointV = whitePoint.v
+  }
+}
+
+/*
+=========================================================
+                    Gamma functions
+=========================================================
+*/
+
 const delta = 6.0 / 29.0
 const deltaCubed = delta * delta * delta
-
-const xD65 = 0.950489
-const yD65 = 1.0
-const zD65 = 1.088840
-
-const uD65 = 4.0 * xD65 / (xD65 + 15.0 * yD65 + 3.0 * zD65)
-const vD65 = 9.0 * yD65 / (xD65 + 15.0 * yD65 + 3.0 * zD65)
 
 function LabGamma(v) {
   if (v <= deltaCubed)
@@ -40,25 +119,25 @@ function sRGBDigamma(v) {
 
 function determinant3x3(m){
   return   m[0] * m[4] * m[8] +
-      m[1] * m[5] * m[6] +
-      m[2] * m[3] * m[7] -
-      m[6] * m[4] * m[2] -
-      m[7] * m[5] * m[0] -
-      m[8] * m[3] * m[1]
+           m[1] * m[5] * m[6] +
+           m[2] * m[3] * m[7] -
+           m[6] * m[4] * m[2] -
+           m[7] * m[5] * m[0] -
+           m[8] * m[3] * m[1]
 }
 
 function invertMatrix3x3(m){
   const det = determinant3x3(m)
   return [
-    (m[4] * m[8] - m[5] * m[7]) / det,
+     (m[4] * m[8] - m[5] * m[7]) / det,
     -(m[1] * m[8] - m[2] * m[7]) / det,
-    (m[1] * m[5] - m[2] * m[4]) / det,
+     (m[1] * m[5] - m[2] * m[4]) / det,
     -(m[3] * m[8] - m[5] * m[6]) / det,
-    (m[0] * m[8] - m[2] * m[6]) / det,
+     (m[0] * m[8] - m[2] * m[6]) / det,
     -(m[0] * m[5] - m[2] * m[3]) / det,
-    (m[3] * m[7] - m[4] * m[6]) / det,
+     (m[3] * m[7] - m[4] * m[6]) / det,
     -(m[0] * m[7] - m[1] * m[6]) / det,
-    (m[0] * m[4] - m[1] * m[3]) / det
+     (m[0] * m[4] - m[1] * m[3]) / det
   ]
 }
 
@@ -115,11 +194,6 @@ function createConversionMatrix(x1, y1, x2, y2, x3, y3, xw, yw){
 const matrixsRGB2XYZ = createConversionMatrix(0.64, 0.33, 0.3, 0.6, 0.15, 0.06, 0.3127, 0.329)
 const matrixXYZ2sRGB = invertMatrix3x3(matrixsRGB2XYZ)
 
-/*
-All XYZ tristimulus values are normalized to Illuminant D65, which simplifies most
-formulas slightly. 
-*/
-
 p5.prototype.sRGB2XYZ = function(r, g, b) {
   const linR = sRGBDigamma(r)
   const linG = sRGBDigamma(g)
@@ -133,16 +207,16 @@ p5.prototype.XYZ2sRGB = function(x, y, z) {
 }
 
 p5.prototype.XYZ2Lab = function(x, y, z) {
-  const L = 116.0 * LabGamma(y / yD65) - 16
-  const a = 500.0 * (LabGamma(x / xD65) - LabGamma(y / yD65))
-  const b = 200.0 * (LabGamma(y / yD65) - LabGamma(z / zD65))
+  const L = 116.0 * LabGamma(y / this.whitePointY) - 16
+  const a = 500.0 * (LabGamma(x / this.whitePointX) - LabGamma(y / this.whitePointY))
+  const b = 200.0 * (LabGamma(y / this.whitePointY) - LabGamma(z / this.whitePointZ))
   return [L, a, b]
 }
 
 p5.prototype.Lab2XYZ = function(L, a, b) {
-  const x = xD65 * LabDigamma((L + 16) / 116.0 + a / 500.0)
-  const y = yD65 * LabDigamma((L + 16) / 116.0)
-  const z = zD65 * LabDigamma((L + 16) / 116.0 - b / 200.0)
+  const x = this.whitePointX * LabDigamma((L + 16) / 116.0 + a / 500.0)
+  const y = this.whitePointY * LabDigamma((L + 16) / 116.0)
+  const z = this.whitePointZ * LabDigamma((L + 16) / 116.0 - b / 200.0)
   return [x, y, z]
 }
 
@@ -152,22 +226,22 @@ TODO D65 values are wrong
 p5.prototype.XYZ2Luv = function(x, y, z) {
   if (x + y + z == 0.0)
     return [0, 0, 0]
-  const L = y <= deltaCubed ? Math.pow(29.0 / 3.0, 3.0) * y : 116.0 * Math.cbrt(y) - 16.0
-  //const uPrime = 4.0 * x * xD65 / (x * xD65 + 15.0 * y * yD65 + 3.0 * z * zD65)
+  const L = (y <= deltaCubed) ? Math.pow(29.0 / 3.0, 3.0) * y / this.whitePointY
+                              : 116.0 * Math.cbrt(y / this.whitePointY) - 16.0
   const uPrime = 4.0 * x / (x + 15.0 * y + 3.0 * z)
-  //const vPrime = 9.0 * y * yD65 / (x * xD65 + 15.0 * y * yD65 + 3.0 * z * zD65)
   const vPrime = 9.0 * y / (x + 15.0 * y + 3.0 * z)
-  const u = 13.0 * L * (uPrime - uD65)
-  const v = 13.0 * L * (vPrime - vD65)
+  const u = 13.0 * L * (uPrime - this.whitePointU)
+  const v = 13.0 * L * (vPrime - this.whitePointV)
   return [L, u, v]
 }
 
 p5.prototype.Luv2XYZ = function(L, u, v) {
   if (L == 0.0)
     return [0, 0, 0]
-  const uPrime = u / 13.0 / L + uD65
-  const vPrime = v / 13.0 / L + vD65
-  const y = L <= 8.0 ? L * Math.pow(3.0 / 29.0, 3.0) : Math.pow((L + 16.0) / 116.0, 3)
+  const uPrime = u / 13.0 / L + this.whitePointU
+  const vPrime = v / 13.0 / L + this.whitePointV
+  const y = (L <= 8.0) ? L * Math.pow(3.0 / 29.0, 3.0) * this.whitePointY
+                       : Math.pow((L + 16.0) / 116.0, 3) * this.whitePointY
   const x = y * 9.0 * uPrime / 4.0 / vPrime
   const z = y * (12.0 - 3.0 * uPrime - 20.0 * vPrime) / 4.0 / vPrime
   return [x, y, z]
@@ -228,6 +302,7 @@ p5.prototype.interpolationSpace = function(space) {
     const unifiedName = space.toLowerCase().trim()
     if (unifiedName in convertFuncs)
       [this.convertFunc, this.convertFuncInverse] = convertFuncs[unifiedName]
+    // TODO: Error message
   }
 }
 
