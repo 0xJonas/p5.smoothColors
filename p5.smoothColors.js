@@ -1,5 +1,10 @@
 "use strict"
 
+function checkParameterTypes(args, ...types){
+  return args.map((element, index) => typeof element == types[index])
+    .reduce((a, b) => a && b)
+}
+
 /*
 =========================================================
                   Standard White points
@@ -16,62 +21,102 @@ function initWhitePoint(x, y) {
   }
 }
 
+p5.prototype.A_2DEG  = Symbol("a 2deg")
+p5.prototype.A_10DEG = Symbol("a 10deg")
+p5.prototype.B_2DEG  = Symbol("b 2deg")
+p5.prototype.B_10DEG = Symbol("b 10deg")
+p5.prototype.C_2DEG  = Symbol("c 2deg")
+p5.prototype.C_10DEG = Symbol("c 10deg")
+p5.prototype.D50_2DEG  = Symbol("d50 2deg")
+p5.prototype.D50_10DEG = Symbol("d50 10deg")
+p5.prototype.D55_2DEG  = Symbol("d55 2deg")
+p5.prototype.D55_10DEG = Symbol("d55 10deg")
+p5.prototype.D65_2DEG  = Symbol("d65 2deg")
+p5.prototype.D65_10DEG = Symbol("d65 10deg")
+p5.prototype.D75_2DEG  = Symbol("d75 2deg")
+p5.prototype.D75_10DEG = Symbol("d75 10deg")
+p5.prototype.E_2DEG  = Symbol("e 2deg")
+p5.prototype.E_10DEG = Symbol("e 10deg")
+p5.prototype.F1_2DEG  = Symbol("f1 2deg")
+p5.prototype.F1_10DEG = Symbol("f1 10deg")
+p5.prototype.F2_2DEG  = Symbol("f2 2deg")
+p5.prototype.F2_10DEG = Symbol("f2 10deg")
+p5.prototype.F3_2DEG  = Symbol("f3 2deg")
+p5.prototype.F3_10DEG = Symbol("f3 10deg")
+p5.prototype.F4_2DEG  = Symbol("f4 2deg")
+p5.prototype.F4_10DEG = Symbol("f4 10deg")
+p5.prototype.F5_2DEG  = Symbol("f5 2deg")
+p5.prototype.F5_10DEG = Symbol("f5 10deg")
+p5.prototype.F6_2DEG  = Symbol("f6 2deg")
+p5.prototype.F6_10DEG = Symbol("f6 10deg")
+p5.prototype.F7_2DEG  = Symbol("f7 2deg")
+p5.prototype.F7_10DEG = Symbol("f7 10deg")
+p5.prototype.F8_2DEG  = Symbol("f8 2deg")
+p5.prototype.F8_10DEG = Symbol("f8 10deg")
+p5.prototype.F9_2DEG  = Symbol("f9 2deg")
+p5.prototype.F9_10DEG = Symbol("f9 10deg")
+p5.prototype.F10_2DEG  = Symbol("f10 2deg")
+p5.prototype.F10_10DEG = Symbol("f10 10deg")
+p5.prototype.F11_2DEG  = Symbol("f11 2deg")
+p5.prototype.F11_10DEG = Symbol("f11 10deg")
+p5.prototype.F12_2DEG  = Symbol("f12 2deg")
+p5.prototype.F12_10DEG = Symbol("f12 10deg")
+
 const whitePoints = {
-  "a 2deg":    initWhitePoint(0.44757, 0.40745),
-  "a 10deg":   initWhitePoint(0.45117, 0.40594),
-  "b 2deg":    initWhitePoint(0.34842, 0.35161),
-  "b 10deg":   initWhitePoint(0.34980, 0.35270),
-  "c 2deg":    initWhitePoint(0.31006, 0.31616),
-  "c 10deg":   initWhitePoint(0.31039, 0.31905),
-  "d50 2deg":  initWhitePoint(0.34567, 0.35850),
-  "d50 10deg": initWhitePoint(0.34773, 0.35952),
-  "d55 2deg":  initWhitePoint(0.33242, 0.34743),
-  "d55 10deg": initWhitePoint(0.33411, 0.34877),
-  "d65 2deg":  initWhitePoint(0.31271, 0.32902),
-  "d65 10deg": initWhitePoint(0.31382, 0.33100),
-  "d75 2deg":  initWhitePoint(0.29902, 0.31485),
-  "d75 10deg": initWhitePoint(0.29968, 0.31740),
-  "e 2deg":    initWhitePoint(1.0 / 3.0, 1.0 / 3.0),
-  "e 10deg":   initWhitePoint(1.0 / 3.0, 1.0 / 3.0),
-  "f1 2deg":   initWhitePoint(0.31310, 0.33727),
-  "f1 10deg":  initWhitePoint(0.31811, 0.33559),
-  "f2 2deg":   initWhitePoint(0.37208, 0.37529),
-  "f2 10deg":  initWhitePoint(0.37925, 0.36733),
-  "f3 2deg":   initWhitePoint(0.40910, 0.39430),
-  "f3 10deg":  initWhitePoint(0.41761, 0.38324),
-  "f4 2deg":   initWhitePoint(0.44018, 0.40329),
-  "f4 10deg":  initWhitePoint(0.44920, 0.39074),
-  "f5 2deg":   initWhitePoint(0.31379, 0.34531),
-  "f5 10deg":  initWhitePoint(0.31975, 0.34246),
-  "f6 2deg":   initWhitePoint(0.37790, 0.38835),
-  "f6 10deg":  initWhitePoint(0.38660, 0.37847),
-  "f7 2deg":   initWhitePoint(0.31292, 0.32933),
-  "f7 10deg":  initWhitePoint(0.31569, 0.32960),
-  "f8 2deg":   initWhitePoint(0.34588, 0.35875),
-  "f8 10deg":  initWhitePoint(0.34902, 0.35939),
-  "f9 2deg":   initWhitePoint(0.37417, 0.37281),
-  "f9 10deg":  initWhitePoint(0.37829, 0.37045),
-  "f10 2deg":  initWhitePoint(0.34609, 0.35986),
-  "f10 10deg": initWhitePoint(0.35090, 0.35444),
-  "f11 2deg":  initWhitePoint(0.38052, 0.37713),
-  "f11 10deg": initWhitePoint(0.38541, 0.37123),
-  "f12 2deg":  initWhitePoint(0.43695, 0.40441),
-  "f12 10deg": initWhitePoint(0.44256, 0.39717)
+  [p5.prototype.A_2DEG]:    initWhitePoint(0.44757, 0.40745),
+  [p5.prototype.A_10DEG]:   initWhitePoint(0.45117, 0.40594),
+  [p5.prototype.B_2DEG]:    initWhitePoint(0.34842, 0.35161),
+  [p5.prototype.B_10DEG]:   initWhitePoint(0.34980, 0.35270),
+  [p5.prototype.C_2DEG]:    initWhitePoint(0.31006, 0.31616),
+  [p5.prototype.C_10DEG]:   initWhitePoint(0.31039, 0.31905),
+  [p5.prototype.D50_2DEG]:  initWhitePoint(0.34567, 0.35850),
+  [p5.prototype.D50_10DEG]: initWhitePoint(0.34773, 0.35952),
+  [p5.prototype.D55_2DEG]:  initWhitePoint(0.33242, 0.34743),
+  [p5.prototype.D55_10DEG]: initWhitePoint(0.33411, 0.34877),
+  [p5.prototype.D65_2DEG]:  initWhitePoint(0.31271, 0.32902),
+  [p5.prototype.D65_10DEG]: initWhitePoint(0.31382, 0.33100),
+  [p5.prototype.D75_2DEG]:  initWhitePoint(0.29902, 0.31485),
+  [p5.prototype.D75_10DEG]: initWhitePoint(0.29968, 0.31740),
+  [p5.prototype.E_2DEG]:    initWhitePoint(1.0 / 3.0, 1.0 / 3.0),
+  [p5.prototype.E_10DEG]:   initWhitePoint(1.0 / 3.0, 1.0 / 3.0),
+  [p5.prototype.F1_2DEG]:   initWhitePoint(0.31310, 0.33727),
+  [p5.prototype.F1_10DEG]:  initWhitePoint(0.31811, 0.33559),
+  [p5.prototype.F2_2DEG]:   initWhitePoint(0.37208, 0.37529),
+  [p5.prototype.F2_10DEG]:  initWhitePoint(0.37925, 0.36733),
+  [p5.prototype.F3_2DEG]:   initWhitePoint(0.40910, 0.39430),
+  [p5.prototype.F3_10DEG]:  initWhitePoint(0.41761, 0.38324),
+  [p5.prototype.F4_2DEG]:   initWhitePoint(0.44018, 0.40329),
+  [p5.prototype.F4_10DEG]:  initWhitePoint(0.44920, 0.39074),
+  [p5.prototype.F5_2DEG]:   initWhitePoint(0.31379, 0.34531),
+  [p5.prototype.F5_10DEG]:  initWhitePoint(0.31975, 0.34246),
+  [p5.prototype.F6_2DEG]:   initWhitePoint(0.37790, 0.38835),
+  [p5.prototype.F6_10DEG]:  initWhitePoint(0.38660, 0.37847),
+  [p5.prototype.F7_2DEG]:   initWhitePoint(0.31292, 0.32933),
+  [p5.prototype.F7_10DEG]:  initWhitePoint(0.31569, 0.32960),
+  [p5.prototype.F8_2DEG]:   initWhitePoint(0.34588, 0.35875),
+  [p5.prototype.F8_10DEG]:  initWhitePoint(0.34902, 0.35939),
+  [p5.prototype.F9_2DEG]:   initWhitePoint(0.37417, 0.37281),
+  [p5.prototype.F9_10DEG]:  initWhitePoint(0.37829, 0.37045),
+  [p5.prototype.F10_2DEG]:  initWhitePoint(0.34609, 0.35986),
+  [p5.prototype.F10_10DEG]: initWhitePoint(0.35090, 0.35444),
+  [p5.prototype.F11_2DEG]:  initWhitePoint(0.38052, 0.37713),
+  [p5.prototype.F11_10DEG]: initWhitePoint(0.38541, 0.37123),
+  [p5.prototype.F12_2DEG]:  initWhitePoint(0.43695, 0.40441),
+  [p5.prototype.F12_10DEG]: initWhitePoint(0.44256, 0.39717)
 }
 
-p5.prototype.currentWhitePoint = "d65 2deg"
-p5.prototype.whitePointX = whitePoints["d65 2deg"].X
-p5.prototype.whitePointY = whitePoints["d65 2deg"].Y
-p5.prototype.whitePointZ = whitePoints["d65 2deg"].Z
-p5.prototype.whitePointU = whitePoints["d65 2deg"].u
-p5.prototype.whitePointV = whitePoints["d65 2deg"].v
+p5.prototype.currentWhitePoint = p5.prototype.D65_2DEG
+p5.prototype.whitePointX = whitePoints[p5.prototype.D65_2DEG].X
+p5.prototype.whitePointY = whitePoints[p5.prototype.D65_2DEG].Y
+p5.prototype.whitePointZ = whitePoints[p5.prototype.D65_2DEG].Z
+p5.prototype.whitePointU = whitePoints[p5.prototype.D65_2DEG].u
+p5.prototype.whitePointV = whitePoints[p5.prototype.D65_2DEG].v
 
-p5.prototype.whitePoint = function(name) {
-  if(name === undefined)
+p5.prototype.whitePoint = function(whitePoint) {
+  if(whitePoint === undefined)
     return this.currentWhitePoint
   else {
-    const unifiedName = name.trim().toLowerCase()
-    const whitePoint = whitePoints[unifiedName]
+    const whitePoint = whitePoints[whitePoint]
     this.whitePointX = whitePoint.X
     this.whitePointY = whitePoint.Y
     this.whitePointZ = whitePoint.Z
@@ -220,9 +265,6 @@ p5.prototype.Lab2XYZ = function(L, a, b) {
   return [x, y, z]
 }
 
-/*
-TODO D65 values are wrong
-*/
 p5.prototype.XYZ2Luv = function(x, y, z) {
   if (x + y + z == 0.0)
     return [0, 0, 0]
@@ -274,22 +316,28 @@ p5.prototype.XYZ2XYZ = function(x, y, z) {
   return [x, y, z]
 }
 
+/*
+=========================================================
+                  Color Interpolation
+=========================================================
+*/
 
-p5.prototype.CIELab = "CIELab"
-p5.prototype.CIELuv = "CIELuv"
-p5.prototype.CIELCh = "CIELCh"
-p5.prototype.CIELChuv = "CIELChuv"
-p5.prototype.CIEXYZ = "CIEXYZ"
-p5.prototype.sRGB = "sRGB"
+p5.prototype.CIEXYZ = Symbol("CIEXYZ")
+p5.prototype.CIELab = Symbol("CIELab")
+p5.prototype.CIELuv = Symbol("CIELuv")
+p5.prototype.CIELCh = Symbol("CIELCh")
+p5.prototype.CIELChuv = Symbol("CIELChuv")
+p5.prototype.sRGB = Symbol("sRGB")
 
-p5.prototype.currentInterpolationSpace = "CIELab"
+p5.prototype.currentInterpolationSpace = p5.prototype.CIELab
+
 const convertFuncs = {
-  "ciexyz":   [p5.prototype.XYZ2XYZ,   p5.prototype.XYZ2XYZ],
-  "cielab":   [p5.prototype.XYZ2Lab,   p5.prototype.Lab2XYZ],
-  "cieluv":   [p5.prototype.XYZ2Luv,   p5.prototype.Luv2XYZ],
-  "cielch":   [p5.prototype.XYZ2LCh,   p5.prototype.LCh2XYZ],
-  "cielchuv": [p5.prototype.XYZ2LChuv, p5.prototype.LChuv2XYZ],
-  "srgb":     [p5.prototype.XYZ2sRGB,  p5.prototype.sRGB2XYZ]
+  [p5.prototype.CIEXYZ]:   [p5.prototype.XYZ2XYZ,   p5.prototype.XYZ2XYZ],
+  [p5.prototype.CIELab]:   [p5.prototype.XYZ2Lab,   p5.prototype.Lab2XYZ],
+  [p5.prototype.CIELuv]:   [p5.prototype.XYZ2Luv,   p5.prototype.Luv2XYZ],
+  [p5.prototype.CIELCh]:   [p5.prototype.XYZ2LCh,   p5.prototype.LCh2XYZ],
+  [p5.prototype.CIELChuv]: [p5.prototype.XYZ2LChuv, p5.prototype.LChuv2XYZ],
+  [p5.prototype.sRGB]:     [p5.prototype.XYZ2sRGB,  p5.prototype.sRGB2XYZ]
 }
 
 p5.prototype.convertFunc = p5.prototype.XYZ2Lab
@@ -299,13 +347,49 @@ p5.prototype.interpolationSpace = function(space) {
   if (space === undefined)
     return this.currentInterpolationSpace
   else {
-    const unifiedName = space.toLowerCase().trim()
-    if (unifiedName in convertFuncs)
-      [this.convertFunc, this.convertFuncInverse] = convertFuncs[unifiedName]
+    if (space in convertFuncs)
+      [this.convertFunc, this.convertFuncInverse] = convertFuncs[space]
     // TODO: Error message
   }
 }
 
+const COLORS = Symbol("colors")
+const AMOUNTS = Symbol("amounts")
+
+function findIndex(list, value) {
+  for(let i = 0; i < list.length; i++){
+    if(list[i] > value)
+      return i
+  }
+  return list.length
+}
+
+p5.prototype.colorSequence = function(...args){
+  if(args.length & 1 !== 0) {
+    //TODO
+  }
+
+  colors = args[0]
+  amounts = args[1]
+
+  for(let i = 0; i < args.length; i += 2) {
+    const index = findIndex(amount, args[i + 1])
+    colors.splice(index, 0, args[i])
+    amounts.splice(index, 0, args[i + 1])
+  }
+
+  return {
+    [COLORS]: colors,
+    [AMOUNTS]: amounts,
+    addColorStop: function(color, amount) {
+      const index = findIndex(this[AMOUNTS], amount)
+      this[COLORS].splice(index, 0, color)
+      this[AMOUNTS].splice(index, 0, amount)
+    }
+  }
+}
+
+//TODO keep this function?
 function smoothColor(...args) {
   const c = color(...args)
   const newRed = constrain(LabGamma(red(c) / 255.0) * 255.0, 0, 255)
@@ -314,33 +398,73 @@ function smoothColor(...args) {
   return color(newRed, newGreen, newBlue)
 }
 
-p5.prototype.smoothLerpColor = function(c1, c2, amount) {
-  return color(...smoothLerpColorArray(
-    [red(c1), green(c1), blue(c1)],
-    [red(c2), green(c2), blue(c2)],
-    amount
-  ))
+//p5.prototype.smoothLerpColor = function(c1, c2, amount) {
+p5.prototype.smoothLerpColor = function(...args) {
+  switch(args.length){
+    //smoothLerpColor(colorSeq, amt)
+    case 2:
+      if(checkParameterTypes(args, "object", "number")){
+        //return this.smoothLerpSeq(...args)
+      }
+      break
+
+    //smoothLerpColor(col1, col2, amt)
+    case 3:
+      if(checkParameterTypes(args, "object", "object", "number")){
+        const amount = args[2]
+        return this.color(...this._smoothLerpColorBase(
+          red(args[0]), green(args[0]), blue(args[0]), 255,
+          red(args[1]), green(args[1]), blue(args[1]), 255,
+          amount
+        ))
+      }
+      break
+
+    case 7:
+      if(checkParameterTypes(args, "number", "number", "number", "number", "number", "number", "number")){
+        const amount = args[6]
+        return this.color(...this._smoothLerpColorBase(
+          args[0], args[1], args[2], 255,
+          args[3], args[4], args[5], 255,
+          amount
+        ))
+      }
+      break
+
+    case 9:
+      if(checkParameterTypes(args, "number", "number", "number", "number", "number", "number", "number", "number", "number")){
+        const amount = args[8]
+        return this.color(...this._smoothLerpColorBase(
+          args[0], args[1], args[2], args[3],
+          args[4], args[5], args[6], args[7],
+          amount
+        ))
+      }
+      break    
+  }
+  //TODO Error message
 }
 
 //Creating my own lerp function since calling into the p5 api has a 
 //massive overhead because of parameter validation
-function myLerp(v1, v2, amt) {
-  return v1 + (v2 - v1) * amt
+function myLerp(v1, v2, amount) {
+  return v1 + (v2 - v1) * amount
 }
 
-p5.prototype.smoothLerpColorArray = function(c1, c2, amt) {
-  const xyz1 = this.sRGB2XYZ(c1[0] / 255.0, c1[1] / 255.0, c1[2] / 255.0)
-  const xyz2 = this.sRGB2XYZ(c2[0] / 255.0, c2[1] / 255.0, c2[2] / 255.0)
+p5.prototype._smoothLerpColorBase = function(r1, g1, b1, a1, r2, g2, b2, a2, amount) {
+  const xyz1 = this.sRGB2XYZ(r1 / 255.0, g1 / 255.0, b1 / 255.0)
+  const xyz2 = this.sRGB2XYZ(r2 / 255.0, g2 / 255.0, b2 / 255.0)
   const transformed1 = this.convertFunc(...xyz1)
   const transformed2 = this.convertFunc(...xyz2)
 
   const newXYZ = this.convertFuncInverse(
-    myLerp(transformed1[0], transformed2[0], amt),
-    myLerp(transformed1[1], transformed2[1], amt),
-    myLerp(transformed1[2], transformed2[2], amt)
+    myLerp(transformed1[0], transformed2[0], amount),
+    myLerp(transformed1[1], transformed2[1], amount),
+    myLerp(transformed1[2], transformed2[2], amount)
   )
   const newsRGB = this.XYZ2sRGB(...newXYZ)
-  return [newsRGB[0] * 255, newsRGB[1] * 255, newsRGB[2] * 255]
+  const newAlpha = myLerp(a1, a2, amount)
+  return [newsRGB[0] * 255, newsRGB[1] * 255, newsRGB[2] * 255, newAlpha]
 }
 
 //=========================================
