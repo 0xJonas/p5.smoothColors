@@ -5,7 +5,7 @@ const myP5 = new p5(_ => {
   function draw(){}
 })
 
-const EPSILON = 1e-6
+const EPSILON = 1e-4
 
 function compareColors(c1, c2) {
   chai.assert(
@@ -34,13 +34,13 @@ describe("Color space conversions", function(){
   })
   describe("CIEXYZ to CIELab", function(){
     it("XYZ2Lab(0.44, 0.70, 0.70)", function(){
-      compareColors(myP5.XYZ2Lab(0.44, 0.70, 0.70), [86.99686420214168, -57.165004554587284, 4.967342179754186])
+      compareColors(myP5.XYZ2Lab(0.44, 0.70, 0.70), [86.99686420214168,-57.15680384473431,4.970532249634529])
     })
     it("XYZ2Lab(0.0128, 0.0077, 0.0337)", function(){
-      compareColors(myP5.XYZ2Lab(0.0128, 0.0077, 0.0337), [6.955381481481481, 20.011652956918798, -23.21582233759244])
+      compareColors(myP5.XYZ2Lab(0.0128, 0.0077, 0.0337), [6.955381481481481,20.014175104784023,-23.214661840249995])
     })
     it("XYZ2Lab(0.8518, 0.9097, 0.726)", function(){
-      compareColors(myP5.XYZ2Lab(0.8518, 0.9097, 0.726), [96.39769045798434, -2.4138158854643543, 19.06447104401854])
+      compareColors(myP5.XYZ2Lab(0.8518, 0.9097, 0.726), [96.39769045798434,-2.4035952060497134,19.067700130849975])
     })
   })
   describe("sRGB to CIEXYZ", function(){

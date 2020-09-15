@@ -1,0 +1,22 @@
+{
+  "name": "p5.smoothcolors",
+  "version": "1.0.0",
+  "description": "p5.js library that adds various color spaces and draws gradients",
+  "main": "p5.smoothColors.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/0xJonas/p5.smoothColors.git"
+  },
+  "author": "Delphi1024",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/0xJonas/p5.smoothColors/issues"
+  },
+  "homepage": "https://github.com/0xJonas/p5.smoothColors#readme"
+}
