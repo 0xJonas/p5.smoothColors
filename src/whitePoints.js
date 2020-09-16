@@ -1,3 +1,4 @@
+import {multMatrixVector3x3, matrixXYZToCAT02} from "./colorSpaceConversions.js"
 
 const WP_X = Symbol("x")
 const WP_Y = Symbol("y")
@@ -6,12 +7,19 @@ const WP_U = Symbol("u")
 const WP_V = Symbol("v")
 
 function initWhitePoint(x, y) {
+  const X = x / y
+  const Y = 1.0
+  const Z = (1.0 - x - y) / y
+  const [L, M, S] = multMatrixVector3x3(matrixXYZToCAT02, [X, Y, Z])
   return {
-    X: x / y,
-    Y: 1.0,
-    Z: (1.0 - x - y) / y,
+    X: X,
+    Y: Y,
+    Z: Z,
     u: 4.0 * x / (-2.0 * x + 12.0 * y + 3),
-    v: 9.0 * x / (-2.0 * x + 12.0 * y + 3)
+    v: 9.0 * x / (-2.0 * x + 12.0 * y + 3),
+    L: L,
+    M: M,
+    S: S
   }
 }
 

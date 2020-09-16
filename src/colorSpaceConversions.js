@@ -1,7 +1,14 @@
-import * as wp from "./whitePoints.js"
 
 const delta = 6.0 / 29.0
 const deltaCubed = delta * delta * delta
+
+//TODO make modifiable
+//Use CIECAM02's "Dim" environment
+const CAM02_F = 0.9
+const bgLuminance = 200
+const adaptation = CAM02_F * (1 - 1.0 / 3.6 * Math.exp((-bgLuminance + 42) / 92))
+const CAM02_k4 = Math.pow(1.0 / (5.0 * bgLuminance + 1.0), 4)
+const CAM02_FL = 0.2 * CAM02_k4 * 5 * bgLuminance + 0.1 * Math.pow(1 - CAM02_k4, 2) * Math.cbrt(5 * bgLuminance)
 
 function LabGamma(v) {
   if (v <= deltaCubed)
@@ -29,6 +36,18 @@ function sRGBDigamma(v) {
     return v / 12.92
   else
     return Math.pow((v + 0.055) / 1.055, 2.4)
+}
+
+function CAM02Compression(v) {
+  const sign = Math.sign(v)
+  const withGamma = Math.pow(CAM02_FL * Math.abs(v) / 100.0, 0.42)
+  return sign * (400.0 * withGamma / (27.13 + withGamma) + 0.1)
+}
+
+function CAM02Expansion(v) {
+  const sign = Math.sign(v)
+  const withGamma = 27.13 * (v - 0.1) / (400.0 - (v - 0.1))
+  return sign * 100 * Math.pow(withGamma, 1.0 / 0.42) / CAM02_FL
 }
 
 function determinant3x3(m){
@@ -99,8 +118,24 @@ function createConversionMatrix(x1, y1, x2, y2, x3, y3, xw, yw){
   ]
 }
 
+//================================================
+
 const matrixsRGB2XYZ = createConversionMatrix(0.64, 0.33, 0.3, 0.6, 0.15, 0.06, 0.3127, 0.329)
 const matrixXYZ2sRGB = invertMatrix3x3(matrixsRGB2XYZ)
+
+const matrixXYZToCAT02 = [
+   0.7328, 0.4296, -0.1624,
+  -0.7036, 1.6975,  0.0061,
+   0.0030, 0.0136,  0.9834
+]
+const matrixCAT02ToXYZ = invertMatrix3x3(matrixXYZToCAT02)
+
+const matrixXYZ2HPE = [
+   0.38971, 0.68898, -0.07868,
+  -0.22981, 1.18340,  0.04641,
+   0.00000, 0.00000,  1.00000
+]
+const matrixHPE2XYZ = invertMatrix3x3(matrixXYZ2HPE)
 
 function sRGB2XYZ(r, g, b) {
   const linR = sRGBDigamma(r)
@@ -153,27 +188,58 @@ function Luv2XYZ(L, u, v) {
 }
 
 function XYZ2LCh(x, y, z) {
-  const [L, a, b] = XYZ2Lab(x, y, z)
+  const [L, a, b] = this.XYZ2Lab(x, y, z)
   return [L, Math.sqrt((a * a) + (b * b)), Math.atan2(b, a)] 
 }
 
 function LCh2XYZ(L, C, h) {
   const a = C * Math.cos(h)
   const b = C * Math.sin(h)
-  return Lab2XYZ(L, a, b)
+  return this.Lab2XYZ(L, a, b)
 }
 
 function XYZ2LChuv(x, y, z) {
-  const [L, u, v] = XYZ2Luv(x, y, z)
+  const [L, u, v] = this.XYZ2Luv(x, y, z)
   return [L, Math.sqrt((u * u) + (v * v)), Math.atan2(v, u)] 
 }
 
 function LChuv2XYZ(L, C, h) {
   const u = C * Math.cos(h)
   const v = C * Math.sin(h)
-  return Luv2XYZ(L, u, v)
+  return this.Luv2XYZ(L, u, v)
 }
 
+function XYZ2CAM02(x, y, z) {
+  //Convert to CAT02 LMS
+  let [L, M, S] = multMatrixVector3x3(matrixXYZToCAT02, [x, y, z]);
+
+  //Chromatic adaptation
+  L *= (this._whitePointValues.Y / this._whitePointValues.L * adaptation) + (1.0 - adaptation);
+  M *= (this._whitePointValues.Y / this._whitePointValues.M * adaptation) + (1.0 - adaptation);
+  S *= (this._whitePointValues.Y / this._whitePointValues.S * adaptation) + (1.0 - adaptation);
+
+  //Convert back to XYZ and than to HPE
+  [L, M, S] = multMatrixVector3x3(matrixCAT02ToXYZ, [L, M, S]);
+  [L, M, S] = multMatrixVector3x3(matrixXYZ2HPE, [L, M, S]);
+
+  //Apply compression
+  return [CAM02Compression(L), CAM02Compression(M), CAM02Compression(S)]
+}
+
+function CAM022XYZ(L, M, S) {
+  L = CAM02Expansion(L)
+  M = CAM02Expansion(M)
+  S = CAM02Expansion(S);
+
+  [L, M, S] = multMatrixVector3x3(matrixHPE2XYZ, [L, M, S]);
+  [L, M, S] = multMatrixVector3x3(matrixXYZToCAT02, [L, M, S]);
+
+  L /= (this._whitePointValues.Y / this._whitePointValues.L * adaptation) + (1.0 - adaptation);
+  M /= (this._whitePointValues.Y / this._whitePointValues.M * adaptation) + (1.0 - adaptation);
+  S /= (this._whitePointValues.Y / this._whitePointValues.S * adaptation) + (1.0 - adaptation);
+
+  return multMatrixVector3x3(matrixCAT02ToXYZ, [L, M, S])
+}
 
 function XYZ2XYZ(x, y, z) {
   return [x, y, z]
@@ -185,5 +251,9 @@ export {
   Luv2XYZ, XYZ2Luv,
   LCh2XYZ, XYZ2LCh,
   LChuv2XYZ, XYZ2LChuv,
-  XYZ2XYZ
+  CAM022XYZ, XYZ2CAM02,
+  XYZ2XYZ,
+
+  multMatrixVector3x3,
+  matrixXYZToCAT02
 }

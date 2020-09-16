@@ -78,6 +78,7 @@ p5.prototype.CIELab = cint.CIELab
 p5.prototype.CIELuv = cint.CIELuv
 p5.prototype.CIELCh = cint.CIELCh
 p5.prototype.CIELChuv = cint.CIELChuv
+p5.prototype.CIECAM02 = cint.CIECAM02
 p5.prototype.sRGB = cint.sRGB
 
 p5.prototype.interpolationSpace = cint.interpolationSpace

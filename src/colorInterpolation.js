@@ -5,6 +5,7 @@ const CIELab = Symbol("CIELab")
 const CIELuv = Symbol("CIELuv")
 const CIELCh = Symbol("CIELCh")
 const CIELChuv = Symbol("CIELChuv")
+const CIECAM02 = Symbol("CIECAM02")
 const sRGB = Symbol("sRGB")
 
 const conversionFuncs = {
@@ -13,6 +14,7 @@ const conversionFuncs = {
   [CIELuv]:   [conv.XYZ2Luv,   conv.Luv2XYZ],
   [CIELCh]:   [conv.XYZ2LCh,   conv.LCh2XYZ],
   [CIELChuv]: [conv.XYZ2LChuv, conv.LChuv2XYZ],
+  [CIECAM02]: [conv.XYZ2CAM02, conv.CAM022XYZ],
   [sRGB]:     [conv.XYZ2sRGB,  conv.sRGB2XYZ]
 }
 
@@ -20,8 +22,8 @@ function interpolationSpace(space) {
   if (space === undefined)
     return this._currentInterpolationSpace
   else {
-    if (space in convertFuncs)
-      this._currentInterpolationSpace = convertFuncs[space]
+    if (space in conversionFuncs)
+      this._currentInterpolationSpace = space
     // TODO: Error message
   }
 }
@@ -90,7 +92,8 @@ function smoothLerpColor(...args) {
     case 3:
       if(checkParameterTypes(args, "object", "object", "number")){
         const amount = args[2]
-        return color(...smoothLerpColorBase(
+        return color(...smoothLerpColorBase.call(
+          this,
           red(args[0]), green(args[0]), blue(args[0]), 255,
           red(args[1]), green(args[1]), blue(args[1]), 255,
           amount
@@ -101,7 +104,8 @@ function smoothLerpColor(...args) {
     case 7:
       if(checkParameterTypes(args, "number", "number", "number", "number", "number", "number", "number")){
         const amount = args[6]
-        return color(...smoothLerpColorBase(
+        return color(...smoothLerpColorBase.call(
+          this,
           args[0], args[1], args[2], 255,
           args[3], args[4], args[5], 255,
           amount
@@ -112,7 +116,8 @@ function smoothLerpColor(...args) {
     case 9:
       if(checkParameterTypes(args, "number", "number", "number", "number", "number", "number", "number", "number", "number")){
         const amount = args[8]
-        return color(...smoothLerpColorBase(
+        return color(...smoothLerpColorBase.call(
+          this,
           args[0], args[1], args[2], args[3],
           args[4], args[5], args[6], args[7],
           amount
@@ -154,6 +159,7 @@ export {
   CIELuv,
   CIELCh,
   CIELChuv,
+  CIECAM02,
   sRGB,
   interpolationSpace,
   colorSequence,
