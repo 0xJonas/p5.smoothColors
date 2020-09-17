@@ -167,24 +167,24 @@ function XYZ2Luv(x, y, z) {
   if (x + y + z == 0.0)
     return [0, 0, 0]
   const L = (y <= deltaCubed) ? Math.pow(29.0 / 3.0, 3.0) * y / this._whitePointValues.Y
-                              : 116.0 * Math.cbrt(y / this._whitePointValues.Y) - 16.0
-  const uPrime = 4.0 * x / (x + 15.0 * y + 3.0 * z)
-  const vPrime = 9.0 * y / (x + 15.0 * y + 3.0 * z)
-  const u = 13.0 * L * (uPrime - this._whitePointValues.U)
-  const v = 13.0 * L * (vPrime - this._whitePointValues.V)
+                              : 116.0 * Math.cbrt(y / this._whitePointValues.Y) - 16.0;
+  const uPrime = 4.0 * x / (x + 15.0 * y + 3.0 * z);
+  const vPrime = 9.0 * y / (x + 15.0 * y + 3.0 * z);
+  const u = 13.0 * L * (uPrime - this._whitePointValues.u);
+  const v = 13.0 * L * (vPrime - this._whitePointValues.v);
   return [L, u, v]
 }
 
 function Luv2XYZ(L, u, v) {
   if (L == 0.0)
     return [0, 0, 0]
-  const uPrime = u / 13.0 / L + this._whitePointValues.U
-  const vPrime = v / 13.0 / L + this._whitePointValues.V
+  const uPrime = u / 13.0 / L + this._whitePointValues.u;
+  const vPrime = v / 13.0 / L + this._whitePointValues.v;
   const y = (L <= 8.0) ? L * Math.pow(3.0 / 29.0, 3.0) * this._whitePointValues.Y
-                       : Math.pow((L + 16.0) / 116.0, 3) * this._whitePointValues.Y
-  const x = y * 9.0 * uPrime / 4.0 / vPrime
-  const z = y * (12.0 - 3.0 * uPrime - 20.0 * vPrime) / 4.0 / vPrime
-  return [x, y, z]
+                       : Math.pow((L + 16.0) / 116.0, 3) * this._whitePointValues.Y;
+  const x = y * 9.0 * uPrime / 4.0 / vPrime;
+  const z = y * (12.0 - 3.0 * uPrime - 20.0 * vPrime) / 4.0 / vPrime;
+  return [x, y, z];
 }
 
 function XYZ2LCh(x, y, z) {

@@ -16,7 +16,7 @@ function initWhitePoint(x, y) {
     Y: Y,
     Z: Z,
     u: 4.0 * x / (-2.0 * x + 12.0 * y + 3),
-    v: 9.0 * x / (-2.0 * x + 12.0 * y + 3),
+    v: 9.0 * y / (-2.0 * x + 12.0 * y + 3),
     L: L,
     M: M,
     S: S
