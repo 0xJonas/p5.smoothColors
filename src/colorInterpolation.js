@@ -1,4 +1,5 @@
 import * as conv from "./colorSpaceConversions.js"
+import * as log from "./logging.js"
 
 const CIEXYZ = Symbol("CIEXYZ")
 const CIELab = Symbol("CIELab")
@@ -24,7 +25,7 @@ function interpolationSpace(space) {
   else {
     if (space in conversionFuncs)
       this._currentInterpolationSpace = space
-    // TODO: Error message
+    log.error(log.ILLEGAL_ARGUMENT_ERROR, `${space} is not a valid interpolation space.`, "interpolationSpace")
   }
 }
 
@@ -41,7 +42,7 @@ function findIndex(list, value) {
 
 function colorSequence(...args){
   if(args.length & 1 !== 0) {
-    //TODO
+    log.error(log.ILLEGAL_ARGUMENT_ERROR, "Parameters to colorSequence() must be alternating color and amount values.", "colorSequence")
   }
 
   colors = args[0]
@@ -73,61 +74,6 @@ function smoothColor(...args) {
   return color(newRed, newGreen, newBlue)
 }
 
-function checkParameterTypes(args, ...types){
-  return args.map((element, index) => typeof element == types[index])
-    .reduce((a, b) => a && b)
-}
-
-//p5.prototype.smoothLerpColor = function(c1, c2, amount) {
-function smoothLerpColor(...args) {
-  switch(args.length){
-    //smoothLerpColor(colorSeq, amt)
-    case 2:
-      if(checkParameterTypes(args, "object", "number")){
-        //return this.smoothLerpSeq(...args)
-      }
-      break
-
-    //smoothLerpColor(col1, col2, amt)
-    case 3:
-      if(checkParameterTypes(args, "object", "object", "number")){
-        const amount = args[2]
-        return color(...smoothLerpColorBase.call(
-          this,
-          red(args[0]), green(args[0]), blue(args[0]), 255,
-          red(args[1]), green(args[1]), blue(args[1]), 255,
-          amount
-        ))
-      }
-      break
-
-    case 7:
-      if(checkParameterTypes(args, "number", "number", "number", "number", "number", "number", "number")){
-        const amount = args[6]
-        return color(...smoothLerpColorBase.call(
-          this,
-          args[0], args[1], args[2], 255,
-          args[3], args[4], args[5], 255,
-          amount
-        ))
-      }
-      break
-
-    case 9:
-      if(checkParameterTypes(args, "number", "number", "number", "number", "number", "number", "number", "number", "number")){
-        const amount = args[8]
-        return color(...smoothLerpColorBase.call(
-          this,
-          args[0], args[1], args[2], args[3],
-          args[4], args[5], args[6], args[7],
-          amount
-        ))
-      }
-      break    
-  }
-  //TODO Error message
-}
-
 //Creating my own lerp function since calling into the p5 api has a 
 //massive overhead because of parameter validation
 function myLerp(v1, v2, amount) {
@@ -151,6 +97,52 @@ function smoothLerpColorBase(r1, g1, b1, a1, r2, g2, b2, a2, amount) {
   const newsRGB = this.XYZ2sRGB(...newXYZ)
   const newAlpha = myLerp(a1, a2, amount)
   return [newsRGB[0] * 255, newsRGB[1] * 255, newsRGB[2] * 255, newAlpha]
+}
+
+function smoothLerpColorSeq(seq, amount) {
+  
+}
+
+function smoothLerpColor(...args) {
+  switch(args.length){
+    //smoothLerpColor(colorSeq, amount)
+    case 2:
+      checkParameterTypes(args, "object", "number")
+        //return this.smoothLerpSeq(...args)
+
+    //smoothLerpColor(col1, col2, amount)
+    case 3:
+      checkParameterTypes(args, "object", "object", "number")
+      const amount = args[2]
+      return color(...smoothLerpColorBase.call(
+        this,
+        red(args[0]), green(args[0]), blue(args[0]), 255,
+        red(args[1]), green(args[1]), blue(args[1]), 255,
+        amount
+      ))
+
+    //smoothLerpColor(r1, g1, b1, r2, g2, b2, amount)
+    case 7:
+      checkParameterTypes(args, "number", "number", "number", "number", "number", "number", "number")
+      const amount = args[6]
+      return color(...smoothLerpColorBase.call(
+        this,
+        args[0], args[1], args[2], 255,
+        args[3], args[4], args[5], 255,
+        amount
+      ))
+
+    //smoothLerpColor(r1, g1, b1, a1, r2, g2, b2, a2, amount)
+    case 9:
+      checkParameterTypes("smoothLerpColor", args, "number", "number", "number", "number", "number", "number", "number", "number", "number")
+      const amount = args[8]
+      return color(...smoothLerpColorBase.call(
+        this,
+        args[0], args[1], args[2], args[3],
+        args[4], args[5], args[6], args[7],
+        amount
+      ))    
+  }
 }
 
 export {
